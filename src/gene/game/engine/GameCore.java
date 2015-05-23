@@ -3,9 +3,11 @@ package gene.game.engine;
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
- 
+
+import gene.game.renderer.*;
+
 import java.nio.ByteBuffer;
- 
+
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -19,6 +21,22 @@ public class GameCore {
  
     // The window handle
     private long window;
+    
+    private Loader loader = new Loader();
+    private Renderer renderer = new Renderer();
+    
+    private float[] vertices = {
+    		-0.5f, 0.5f, 0f,
+    		-0.5f, -0.5f, 0f,
+    		0.5f, -0.5f, 0f,
+    		0.5f, 0.5f, 0f
+    };
+    private int[] indices = {
+    		0, 1, 3,
+    		3, 1, 2
+    };
+    
+    RawModel model;
     
     private boolean running = true;
  
@@ -63,7 +81,9 @@ public class GameCore {
         GLContext.createFromCurrent();
  
         // Set the clear color
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+//        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        
+        model = loader.loadToVAO(vertices, indices);
     }
  
     private void loop() {
@@ -98,6 +118,7 @@ public class GameCore {
         		timer += 1000;
         	}
         }
+        loader.cleanUp();
     }
     
     public void update() {
@@ -111,9 +132,12 @@ public class GameCore {
     }
     
     public void render() {
-    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-    	
+//    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+    	    	
     	glfwSwapBuffers(window); // swap the color buffers
+    	
+    	renderer.prepare();
+    	renderer.render(model);
     }
     
     public void stopGame() {
@@ -125,9 +149,13 @@ public class GameCore {
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
- 
-        int WIDTH = 300;
-        int HEIGHT = 300;
+//        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+//        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+//        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        
+        int WIDTH = 800;
+        int HEIGHT = 640;
  
         if (Setting.get(Setting.FULLSCREEN) == 0) {
         	window = glfwCreateWindow(WIDTH, HEIGHT, "My Game", NULL, NULL);
@@ -148,7 +176,7 @@ public class GameCore {
         	if ( window == NULL )
         		throw new RuntimeException("Failed to create the GLFW window");
         }
- 
+     
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
         // Enable v-sync
