@@ -48,16 +48,12 @@ public class GameCore {
         if ( glfwInit() != GL11.GL_TRUE )
             throw new IllegalStateException("Unable to initialize GLFW");
  
+        new Setting();
+        
         createWindow();
         
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
-        	@Override
-        	public void invoke(long window, int key, int scancode, int action, int mods) {
-        		if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-        			glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
-        	}
-        });
+        glfwSetKeyCallback(window, keyCallback = new KeyListener());
     }
  
     private void loop() {
@@ -69,7 +65,7 @@ public class GameCore {
         GLContext.createFromCurrent();
  
         // Set the clear color
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
  
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
@@ -82,6 +78,14 @@ public class GameCore {
             // invoked during this call.
             glfwPollEvents();
         }
+    }
+    
+    public void tick() {
+    	
+    }
+    
+    public void render() {
+    	
     }
     
     private void createWindow() {
@@ -98,7 +102,6 @@ public class GameCore {
         	if ( window == NULL )
         		throw new RuntimeException("Failed to create the GLFW window");
         	
-        	
         	// Get the resolution of the primary monitor
         	ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         	// Center our window
@@ -107,11 +110,6 @@ public class GameCore {
         			(GLFWvidmode.width(vidmode) - WIDTH) / 2,
         			(GLFWvidmode.height(vidmode) - HEIGHT) / 2
         			);
-        	
-        	// Make the OpenGL context current
-        	glfwMakeContextCurrent(window);
-        	// Enable v-sync
-        	glfwSwapInterval(1);
         }
         else {
         	window = glfwCreateWindow(WIDTH, HEIGHT, "My Game", glfwGetPrimaryMonitor(), NULL);
@@ -119,6 +117,11 @@ public class GameCore {
         		throw new RuntimeException("Failed to create the GLFW window");
         }
  
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(window);
+        // Enable v-sync
+        glfwSwapInterval(1);
+
         // Make the window visible
         glfwShowWindow(window);
     }
