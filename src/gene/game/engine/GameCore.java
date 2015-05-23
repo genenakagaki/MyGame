@@ -49,6 +49,15 @@ public class GameCore {
             throw new IllegalStateException("Unable to initialize GLFW");
  
         createWindow();
+        
+        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
+        glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
+        	@Override
+        	public void invoke(long window, int key, int scancode, int action, int mods) {
+        		if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
+        			glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
+        	}
+        });
     }
  
     private void loop() {
@@ -84,33 +93,31 @@ public class GameCore {
         int WIDTH = 300;
         int HEIGHT = 300;
  
-        // Create the window
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
-        if ( window == NULL )
-            throw new RuntimeException("Failed to create the GLFW window");
- 
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
-            @Override
-            public void invoke(long window, int key, int scancode, int action, int mods) {
-                if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-                    glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
-            }
-        });
- 
-        // Get the resolution of the primary monitor
-        ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        // Center our window
-        glfwSetWindowPos(
-            window,
-            (GLFWvidmode.width(vidmode) - WIDTH) / 2,
-            (GLFWvidmode.height(vidmode) - HEIGHT) / 2
-        );
- 
-        // Make the OpenGL context current
-        glfwMakeContextCurrent(window);
-        // Enable v-sync
-        glfwSwapInterval(1);
+        if (Setting.get(Setting.FULLSCREEN) == 0) {
+        	window = glfwCreateWindow(WIDTH, HEIGHT, "My Game", NULL, NULL);
+        	if ( window == NULL )
+        		throw new RuntimeException("Failed to create the GLFW window");
+        	
+        	
+        	// Get the resolution of the primary monitor
+        	ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        	// Center our window
+        	glfwSetWindowPos(
+        			window,
+        			(GLFWvidmode.width(vidmode) - WIDTH) / 2,
+        			(GLFWvidmode.height(vidmode) - HEIGHT) / 2
+        			);
+        	
+        	// Make the OpenGL context current
+        	glfwMakeContextCurrent(window);
+        	// Enable v-sync
+        	glfwSwapInterval(1);
+        }
+        else {
+        	window = glfwCreateWindow(WIDTH, HEIGHT, "My Game", glfwGetPrimaryMonitor(), NULL);
+        	if ( window == NULL )
+        		throw new RuntimeException("Failed to create the GLFW window");
+        }
  
         // Make the window visible
         glfwShowWindow(window);
