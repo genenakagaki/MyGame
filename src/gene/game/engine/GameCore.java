@@ -54,9 +54,7 @@ public class GameCore {
         
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, keyCallback = new KeyListener());
-    }
- 
-    private void loop() {
+        
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
         // LWJGL detects the context that is current in the current thread,
@@ -66,26 +64,60 @@ public class GameCore {
  
         // Set the clear color
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    }
  
-        // Run the rendering loop until the user has attempted to close
-        // the window or has pressed the ESCAPE key.
-        while ( glfwWindowShouldClose(window) == GL_FALSE ) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
- 
-            glfwSwapBuffers(window); // swap the color buffers
- 
-            // Poll for window events. The key callback above will only be
-            // invoked during this call.
-            glfwPollEvents();
+    private void loop() {
+    	double previousTime = glfwGetTime();
+    	double currentTime;
+    	double deltaTime;
+    	
+    	int ups = 60;
+    	double tickInterval = 1.0/ups;
+    	
+    	int updates = 0;
+    	int frames = 0;
+    	long timer = System.currentTimeMillis();
+    	
+        while (running) {
+        	currentTime = glfwGetTime();
+        	deltaTime = currentTime - previousTime;
+        	
+        	while (deltaTime - tickInterval >= 0) {
+        		update();
+        		updates++;
+        		previousTime += tickInterval;
+        		deltaTime = currentTime - previousTime;
+        	}
+        	render();
+        	frames++;
+        	
+        	if (System.currentTimeMillis() - timer >= 1000) {
+        		System.out.println("ups: "+ updates + ", fps: "+ frames);
+        		updates = 0;
+        		frames = 0;
+        		timer += 1000;
+        	}
         }
     }
     
-    public void tick() {
+    public void update() {
+    	if (glfwWindowShouldClose(window) == GL_TRUE) {
+    		stopGame();
+    	}
     	
+    	// Poll for window events. The key callback above will only be
+    	// invoked during this call.
+    	glfwPollEvents();
     }
     
     public void render() {
+    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
     	
+    	glfwSwapBuffers(window); // swap the color buffers
+    }
+    
+    public void stopGame() {
+    	running = false;
     }
     
     private void createWindow() {
