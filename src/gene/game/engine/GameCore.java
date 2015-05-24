@@ -5,6 +5,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import gene.game.renderer.*;
+import gene.game.shaders.StaticShader;
 
 import java.nio.ByteBuffer;
 
@@ -24,6 +25,7 @@ public class GameCore {
     
     private Loader loader = new Loader();
     private Renderer renderer = new Renderer();
+    private StaticShader shader;
     
     private float[] vertices = {
     		-0.5f, 0.5f, 0f,
@@ -84,6 +86,7 @@ public class GameCore {
 //        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         
         model = loader.loadToVAO(vertices, indices);
+        shader = new StaticShader();
     }
  
     private void loop() {
@@ -118,6 +121,7 @@ public class GameCore {
         		timer += 1000;
         	}
         }
+        shader.cleanUp();
         loader.cleanUp();
     }
     
@@ -137,7 +141,9 @@ public class GameCore {
     	glfwSwapBuffers(window); // swap the color buffers
     	
     	renderer.prepare();
+    	shader.start();
     	renderer.render(model);
+    	shader.stop();
     }
     
     public void stopGame() {

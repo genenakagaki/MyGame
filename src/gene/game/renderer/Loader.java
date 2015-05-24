@@ -25,6 +25,11 @@ public class Loader {
 		return new RawModel(vaoID, indices.length);
 	}
 	
+//	public int loadTexture(String fileName) {
+//		Texture texture = null;
+//		texture = TextureLoader.getTexture("PNG", new FileInputStream("res/"+ fileName+".png"));
+//	}
+	
 	public void cleanUp() {
 		for (int vao: VAOs) {
 			glDeleteVertexArrays(vao);
