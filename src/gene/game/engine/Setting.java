@@ -20,7 +20,7 @@ public class Setting {
 	}
 	
 	private void readSettingsFile() {
-		URL fileURL = Setting.class.getResource("/res/configurations/settings");
+		URL fileURL = Setting.class.getResource("/configurations/settings");
 		File file = new File(fileURL.getFile());
 		
 		String line;

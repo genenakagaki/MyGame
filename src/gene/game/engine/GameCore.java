@@ -4,8 +4,11 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import gene.game.models.RawModel;
+import gene.game.models.TexturedModel;
 import gene.game.renderer.*;
 import gene.game.shaders.StaticShader;
+import gene.game.texture.ModelTexture;
 
 import java.nio.ByteBuffer;
 
@@ -37,8 +40,16 @@ public class GameCore {
     		0, 1, 3,
     		3, 1, 2
     };
+    private float[] textureCoords = {
+    		0,0,
+    		0,1,
+    		1,1,
+    		1,0
+    };
     
     RawModel model;
+    ModelTexture texture;
+    TexturedModel texturedModel;
     
     private boolean running = true;
  
@@ -85,7 +96,9 @@ public class GameCore {
         // Set the clear color
 //        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         
-        model = loader.loadToVAO(vertices, indices);
+        model = loader.loadToVAO(vertices, textureCoords, indices);
+        texture = new ModelTexture(loader.loadTexture("image"));
+        texturedModel = new TexturedModel(model, texture);
         shader = new StaticShader();
     }
  
@@ -142,7 +155,7 @@ public class GameCore {
     	
     	renderer.prepare();
     	shader.start();
-    	renderer.render(model);
+    	renderer.render(texturedModel);
     	shader.stop();
     }
     
